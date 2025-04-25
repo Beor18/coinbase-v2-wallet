@@ -135,6 +135,22 @@ export function EvmAccountPanel({ apiKeys }: EvmAccountPanelProps) {
     setError(null)
 
     try {
+      // Añadir transacción al historial como pendiente
+      const pendingTxHash = `pending-${Date.now()}`
+      const pendingTransaction: Transaction = {
+        hash: pendingTxHash,
+        from: "Faucet",
+        to: selectedAccount,
+        amount: "0.05", // Valor estimado
+        token: "ETH",
+        timestamp: new Date().toISOString(),
+        status: "pending",
+        type: "receive",
+        network: network,
+      }
+
+      setTransactions([pendingTransaction, ...transactions])
+
       // Llamar a la acción del servidor para solicitar fondos del faucet
       const response = await fetch("/api/evm/request-faucet", {
         method: "POST",
@@ -156,38 +172,78 @@ export function EvmAccountPanel({ apiKeys }: EvmAccountPanelProps) {
       const data = await response.json()
       const txHash = data.transactionHash
 
-      // Añadir transacción al historial
-      const newTransaction: Transaction = {
-        hash: txHash,
-        from: "Faucet",
-        to: selectedAccount,
-        amount: "0.05",
-        token: "ETH",
-        timestamp: new Date().toISOString(),
-        status: "pending",
-        type: "receive",
-        network: network,
-      }
+      // Actualizar la transacción pendiente con el hash real
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((tx) =>
+          tx.hash === pendingTxHash
+            ? {
+                ...tx,
+                hash: txHash,
+                status: data.confirmed ? "success" : "pending",
+              }
+            : tx,
+        ),
+      )
 
-      setTransactions([newTransaction, ...transactions])
+      toast({
+        title: "Solicitud enviada",
+        description: "Esperando confirmación de la transacción...",
+      })
 
-      // Actualizar el estado de la transacción después de un tiempo
-      setTimeout(() => {
+      // Si la transacción ya está confirmada en la respuesta
+      if (data.confirmed) {
+        // Actualizar el saldo de la cuenta
+        setAccounts((prevAccounts) =>
+          prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: data.balance } : acc)),
+        )
+
         // Actualizar el estado de la transacción
         setTransactions((prevTransactions) =>
           prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
-        )
-
-        // Actualizar el saldo de la cuenta
-        setAccounts((prevAccounts) =>
-          prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: "0.05" } : acc)),
         )
 
         toast({
           title: "Fondos recibidos",
           description: `Transacción: ${txHash.substring(0, 10)}...`,
         })
-      }, 3000)
+      } else {
+        // Si no está confirmada, podríamos implementar un polling para verificar el estado
+        // Pero por ahora, asumimos que se confirmará eventualmente
+        setTimeout(async () => {
+          try {
+            // Verificar si la transacción se ha confirmado
+            const checkResponse = await fetch("/api/evm/wait-for-transaction", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                network: network,
+                hash: txHash,
+              }),
+            })
+
+            if (checkResponse.ok) {
+              // Actualizar el saldo de la cuenta
+              setAccounts((prevAccounts) =>
+                prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: "0.05" } : acc)),
+              )
+
+              // Actualizar el estado de la transacción
+              setTransactions((prevTransactions) =>
+                prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
+              )
+
+              toast({
+                title: "Fondos recibidos",
+                description: `Transacción: ${txHash.substring(0, 10)}...`,
+              })
+            }
+          } catch (checkError) {
+            console.error("Error checking transaction:", checkError)
+          }
+        }, 10000) // Verificar después de 10 segundos
+      }
     } catch (err) {
       console.error("Error requesting funds:", err)
       setError(err instanceof Error ? err.message : "Error al solicitar fondos")

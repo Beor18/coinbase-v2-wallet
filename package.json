@@ -59,7 +59,9 @@
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
     "react-code-blocks": "latest",
-    "viem": "latest"
+    "viem": "latest",
+    "@coinbase/cdp-sdk": "latest",
+    "@solana/web3.js": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

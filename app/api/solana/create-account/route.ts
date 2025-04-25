@@ -1,17 +1,25 @@
 import { NextResponse } from "next/server"
-import { generateRandomSolanaAddress } from "@/lib/utils"
 
 export async function POST(request: Request) {
   try {
-    // Simulamos un pequeño retraso para que parezca una llamada a API real
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Configurar variables de entorno para el SDK de CDP
+    const apiKeyId = process.env.CDP_API_KEY_ID
+    const apiKeySecret = process.env.CDP_API_KEY_SECRET
+    const walletSecret = process.env.CDP_WALLET_SECRET
 
-    // Generamos una dirección Solana aleatoria
-    const address = generateRandomSolanaAddress()
+    if (!apiKeyId || !apiKeySecret || !walletSecret) {
+      throw new Error("Variables de entorno no configuradas")
+    }
 
-    return NextResponse.json({ address })
+    // Importar dinámicamente para evitar problemas de inicialización
+    const { CdpClient } = await import("@coinbase/cdp-sdk")
+    const cdp = new CdpClient()
+
+    const account = await cdp.solana.createAccount()
+
+    return NextResponse.json({ address: account.address })
   } catch (error) {
-    console.error("Error al crear cuenta Solana:", error)
+    console.error("Error creating Solana account:", error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Error al crear la cuenta Solana" },
       { status: 500 },

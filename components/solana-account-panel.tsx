@@ -147,9 +147,14 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
         throw new Error(errorData.error || "Error al solicitar fondos")
       }
 
+      const data = await response.json()
+
+      // Generar un hash de transacción para el historial
+      const txHash = data.signature || "sol-" + Date.now()
+
       // Añadir transacción al historial
       const newTransaction: Transaction = {
-        hash: "sol-" + Date.now(),
+        hash: txHash,
         from: "Faucet",
         to: selectedAccount,
         amount: "1.0",
@@ -162,23 +167,47 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       setTransactions([newTransaction, ...transactions])
 
-      // Actualizar el estado de la transacción después de un tiempo
-      setTimeout(() => {
+      toast({
+        title: "Solicitud enviada",
+        description: "Esperando confirmación de la transacción...",
+      })
+
+      // Si la transacción ya está confirmada en la respuesta
+      if (data.confirmed) {
         // Actualizar el estado de la transacción
         setTransactions((prevTransactions) =>
-          prevTransactions.map((tx) => (tx.hash === newTransaction.hash ? { ...tx, status: "success" } : tx)),
+          prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
         )
 
         // Actualizar el saldo de la cuenta
         setAccounts((prevAccounts) =>
-          prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: "1.0" } : acc)),
+          prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: data.balance } : acc)),
         )
 
         toast({
           title: "Fondos recibidos",
           description: "Tu cuenta ha sido financiada con 1 SOL",
         })
-      }, 3000)
+      } else {
+        // En un entorno real, aquí implementaríamos la función waitForBalance
+        // Para esta demo, simulamos la espera
+        setTimeout(() => {
+          // Actualizar el estado de la transacción
+          setTransactions((prevTransactions) =>
+            prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
+          )
+
+          // Actualizar el saldo de la cuenta
+          setAccounts((prevAccounts) =>
+            prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: "1.0" } : acc)),
+          )
+
+          toast({
+            title: "Fondos recibidos",
+            description: "Tu cuenta ha sido financiada con 1 SOL",
+          })
+        }, 5000)
+      }
     } catch (err) {
       console.error("Error requesting funds:", err)
       setError(err instanceof Error ? err.message : "Error al solicitar fondos")
