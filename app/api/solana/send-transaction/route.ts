@@ -1,26 +1,18 @@
 import { NextResponse } from "next/server"
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js"
+import { CdpClient } from "@coinbase/cdp-sdk"
 
 export async function POST(request: Request) {
   try {
     const { address, to, amount } = await request.json()
 
-    // Configurar variables de entorno para el SDK de CDP
-    const apiKeyId = process.env.CDP_API_KEY_ID
-    const apiKeySecret = process.env.CDP_API_KEY_SECRET
-    const walletSecret = process.env.CDP_WALLET_SECRET
-
-    if (!apiKeyId || !apiKeySecret || !walletSecret) {
-      throw new Error("Variables de entorno no configuradas")
-    }
-
-    // Importar dinámicamente para evitar problemas de inicialización
-    const { CdpClient } = await import("@coinbase/cdp-sdk")
+    // Inicializar el cliente CDP según la documentación
     const cdp = new CdpClient()
 
+    // Crear conexión a la red Solana
     const connection = new Connection("https://api.devnet.solana.com")
 
-    // Convert amount to lamports (1 SOL = 1e9 lamports)
+    // Convertir amount a lamports (1 SOL = 1e9 lamports)
     const lamportsToSend = Math.floor(Number.parseFloat(amount) * 1e9)
 
     const fromAddress = new PublicKey(address)
