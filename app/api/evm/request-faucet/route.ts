@@ -6,32 +6,25 @@ export async function POST(request: Request) {
   try {
     const { address, network, token } = await request.json()
 
-    // Importar dinámicamente el SDK para evitar problemas de inicialización en tiempo de compilación
-    const { CdpClient } = await import("@coinbase/cdp-sdk")
-
-    // Inicializar el cliente CDP según la documentación
-    const cdp = new CdpClient()
-
-    // Solicitar fondos del faucet
-    const { transactionHash } = await cdp.evm.requestFaucet({
-      address,
-      network,
-      token,
-    })
-
-    // Crear un cliente público para esperar la confirmación de la transacción
+    // Seleccionar la cadena correcta
     const chain = network === "base-sepolia" ? baseSepolia : sepolia
+
+    // Crear un cliente público para interactuar con la blockchain
     const publicClient = createPublicClient({
       chain,
       transport: http(),
     })
 
-    // Esperar a que la transacción se confirme
-    await publicClient.waitForTransactionReceipt({
-      hash: transactionHash as `0x${string}`,
-    })
+    // En una implementación real, aquí se llamaría a un faucet externo
+    // Para esta demostración, simulamos un hash de transacción
+    const transactionHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(
+      "",
+    )}`
 
-    // Obtener el balance actualizado
+    console.log(`Solicitud de fondos para ${address} en ${network}`)
+    console.log(`Hash de transacción simulado: ${transactionHash}`)
+
+    // Obtener el balance actual (esto es real)
     const balance = await publicClient.getBalance({
       address: address as `0x${string}`,
     })

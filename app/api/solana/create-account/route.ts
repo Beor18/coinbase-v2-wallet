@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server"
+import { Keypair } from "@solana/web3.js"
 
 export async function POST(request: Request) {
   try {
-    // Importar dinámicamente el SDK para evitar problemas de inicialización en tiempo de compilación
-    const { CdpClient } = await import("@coinbase/cdp-sdk")
+    // Generar un nuevo par de claves Solana
+    const keypair = Keypair.generate()
+    const address = keypair.publicKey.toString()
 
-    // Inicializar el cliente CDP según la documentación
-    const cdp = new CdpClient()
+    // En una implementación real, guardarías la clave privada de forma segura
+    // Aquí solo la guardamos en memoria para la demostración
+    const accountData = {
+      address: address,
+      secretKey: Buffer.from(keypair.secretKey).toString("hex"),
+    }
 
-    // Crear una cuenta Solana
-    const account = await cdp.solana.createAccount()
+    console.log("Cuenta Solana creada:", accountData)
 
-    return NextResponse.json({ address: account.address })
+    return NextResponse.json({ address })
   } catch (error) {
     console.error("Error creating Solana account:", error)
     return NextResponse.json(
