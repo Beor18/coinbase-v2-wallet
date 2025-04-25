@@ -1,36 +1,27 @@
 import { NextResponse } from "next/server"
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts"
 
 export async function POST(request: Request) {
   try {
     const { type, ownerAddress } = await request.json()
 
+    // Importar el SDK de Coinbase de forma dinámica
+    const CdpSdk = await import("@coinbase/cdp-sdk")
+
+    // Inicializar el cliente CDP
+    const cdp = new CdpSdk.CdpClient()
+
     if (type === "regular") {
-      // Generar una nueva clave privada y cuenta
-      const privateKey = generatePrivateKey()
-      const account = privateKeyToAccount(privateKey)
-
-      // Guardar la clave privada de forma segura (en una base de datos real)
-      // Aquí solo la guardamos en memoria para la demostración
-      const accountData = {
-        address: account.address,
-        privateKey: privateKey,
-      }
-
-      // En una implementación real, guardarías esto en una base de datos segura
-      console.log("Cuenta creada:", accountData)
-
-      return NextResponse.json({ address: account.address })
+      // Crear una cuenta regular usando el SDK
+      const evmAccount = await cdp.evm.createAccount()
+      console.log(`Created account: ${evmAccount.address}`)
+      return NextResponse.json({ address: evmAccount.address })
     } else if (type === "smart" && ownerAddress) {
-      // Para una cuenta smart, normalmente se usaría un contrato de cuenta abstracta
-      // Aquí simulamos una dirección derivada del ownerAddress
-      const smartAccountAddress = `0x${ownerAddress.substring(2, 10)}000000000000000000000000000000000${Math.floor(
-        Math.random() * 10000,
-      )
-        .toString()
-        .padStart(4, "0")}`
-
-      return NextResponse.json({ address: smartAccountAddress })
+      // Para cuentas smart, necesitamos una cuenta propietaria
+      const smartAccount = await cdp.evm.createSmartAccount({
+        owner: { address: ownerAddress },
+      })
+      console.log(`Created smart account: ${smartAccount.address}`)
+      return NextResponse.json({ address: smartAccount.address })
     } else {
       return NextResponse.json(
         { error: "Para crear una cuenta smart, se necesita una cuenta regular como propietaria" },

@@ -6,31 +6,43 @@ export async function POST(request: Request) {
   try {
     const { address, network, token } = await request.json()
 
+    // Importar el SDK de Coinbase de forma dinámica
+    const CdpSdk = await import("@coinbase/cdp-sdk")
+
+    // Inicializar el cliente CDP
+    // Nota: No pasamos las credenciales explícitamente, el SDK las tomará de las variables de entorno
+    const cdp = new CdpSdk.CdpClient()
+
+    // Solicitar fondos del faucet usando el SDK
+    const { transactionHash } = await cdp.evm.requestFaucet({
+      address,
+      network,
+      token,
+    })
+
     // Seleccionar la cadena correcta
     const chain = network === "base-sepolia" ? baseSepolia : sepolia
 
-    // Crear un cliente público para interactuar con la blockchain
+    // Crear un cliente público para esperar la confirmación de la transacción
     const publicClient = createPublicClient({
       chain,
       transport: http(),
     })
 
-    // En una implementación real, aquí se llamaría a un faucet externo
-    // Para esta demostración, simulamos un hash de transacción
-    const transactionHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(
-      "",
-    )}`
+    // Esperar a que la transacción se confirme
+    await publicClient.waitForTransactionReceipt({
+      hash: transactionHash as `0x${string}`,
+    })
 
-    console.log(`Solicitud de fondos para ${address} en ${network}`)
-    console.log(`Hash de transacción simulado: ${transactionHash}`)
-
-    // Obtener el balance actual (esto es real)
+    // Obtener el balance actualizado
     const balance = await publicClient.getBalance({
       address: address as `0x${string}`,
     })
 
     // Convertir el balance de wei a ETH (18 decimales)
     const balanceInEth = Number(balance) / 10 ** 18
+
+    console.log(`Received ETH from faucet: https://sepolia.basescan.org/tx/${transactionHash}`)
 
     return NextResponse.json({
       transactionHash,

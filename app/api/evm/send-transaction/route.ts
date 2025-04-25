@@ -1,19 +1,31 @@
 import { NextResponse } from "next/server"
+import { parseEther, formatEther } from "viem"
 
 export async function POST(request: Request) {
   try {
     const { address, network, to, value } = await request.json()
 
-    // En una implementación real, aquí se firmaría y enviaría la transacción
-    // Para esta demostración, simulamos un hash de transacción
-    const transactionHash = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join(
-      "",
-    )}`
+    // Importar el SDK de Coinbase de forma dinámica
+    const CdpSdk = await import("@coinbase/cdp-sdk")
 
-    console.log(`Transacción simulada de ${address} a ${to} por ${value} ETH en ${network}`)
-    console.log(`Hash de transacción simulado: ${transactionHash}`)
+    // Inicializar el cliente CDP
+    const cdp = new CdpSdk.CdpClient()
 
-    return NextResponse.json({ transactionHash })
+    // Enviar la transacción usando el SDK
+    const txResult = await cdp.evm.sendTransaction({
+      address,
+      network,
+      transaction: {
+        to,
+        value: parseEther(value),
+      },
+    })
+
+    console.log(
+      `Sent ${formatEther(parseEther(value))} ETH to ${to}: https://sepolia.basescan.org/tx/${txResult.transactionHash}`,
+    )
+
+    return NextResponse.json({ transactionHash: txResult.transactionHash })
   } catch (error) {
     console.error("Error sending transaction:", error)
     return NextResponse.json(

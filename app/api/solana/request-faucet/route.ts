@@ -5,25 +5,39 @@ export async function POST(request: Request) {
   try {
     const { address, token } = await request.json()
 
+    // Importar el SDK de Coinbase de forma dinámica
+    const CdpSdk = await import("@coinbase/cdp-sdk")
+
+    // Inicializar el cliente CDP
+    const cdp = new CdpSdk.CdpClient()
+
     // Crear conexión a la red Solana
     const connection = new Connection("https://api.devnet.solana.com")
 
-    try {
-      // Intentar solicitar fondos del faucet de Solana
-      // Nota: esto solo funciona en un entorno de desarrollo local con un nodo Solana
-      // En producción, necesitarías usar un faucet externo
-      await connection.requestAirdrop(new PublicKey(address), LAMPORTS_PER_SOL)
-      console.log(`Solicitud de airdrop para ${address}`)
-    } catch (airdropError) {
-      console.error("Error en airdrop, continuando:", airdropError)
-      // Continuamos aunque falle el airdrop, ya que estamos en un entorno de demostración
-    }
+    // Solicitar fondos del faucet usando el SDK
+    await cdp.solana.requestFaucet({
+      address,
+      token,
+    })
 
-    // Obtener el balance actual
-    const balance = await connection.getBalance(new PublicKey(address))
+    // Esperar a que el balance se actualice
+    let balance = 0
+    let attempts = 0
+    const maxAttempts = 30
+
+    while (balance === 0 && attempts < maxAttempts) {
+      balance = await connection.getBalance(new PublicKey(address))
+
+      if (balance === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        attempts++
+      }
+    }
 
     // Convertir de lamports a SOL (9 decimales)
     const balanceInSol = balance / LAMPORTS_PER_SOL
+
+    console.log(`Received ${balanceInSol} SOL from faucet for address: ${address}`)
 
     return NextResponse.json({
       confirmed: true,
