@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server"
-import { CdpClient } from "@coinbase/cdp-sdk"
 import { parseEther } from "viem"
 
 export async function POST(request: Request) {
   try {
     const { address, network, to, value } = await request.json()
+
+    // Importar dinámicamente el SDK para evitar problemas de inicialización en tiempo de compilación
+    const { CdpClient } = await import("@coinbase/cdp-sdk")
 
     // Inicializar el cliente CDP según la documentación
     const cdp = new CdpClient()

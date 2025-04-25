@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server"
 import { Connection, PublicKey, SystemProgram, Transaction } from "@solana/web3.js"
-import { CdpClient } from "@coinbase/cdp-sdk"
 
 export async function POST(request: Request) {
   try {
     const { address, to, amount } = await request.json()
+
+    // Importar dinámicamente el SDK para evitar problemas de inicialización en tiempo de compilación
+    const { CdpClient } = await import("@coinbase/cdp-sdk")
 
     // Inicializar el cliente CDP según la documentación
     const cdp = new CdpClient()
