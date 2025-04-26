@@ -6,11 +6,15 @@ export async function POST(request: Request) {
   try {
     const { address, network, token } = await request.json()
 
+    // Validar los parámetros de entrada
+    if (!address || !network || !token) {
+      return NextResponse.json({ error: "Se requieren los parámetros address, network y token" }, { status: 400 })
+    }
+
     // Importar el SDK de Coinbase de forma dinámica
     const CdpSdk = await import("@coinbase/cdp-sdk")
 
     // Inicializar el cliente CDP
-    // Nota: No pasamos las credenciales explícitamente, el SDK las tomará de las variables de entorno
     const cdp = new CdpSdk.CdpClient()
 
     // Solicitar fondos del faucet usando el SDK
@@ -20,7 +24,7 @@ export async function POST(request: Request) {
       token,
     })
 
-    // Seleccionar la cadena correcta
+    // Seleccionar la cadena correcta basada en el parámetro network
     const chain = network === "base-sepolia" ? baseSepolia : sepolia
 
     // Crear un cliente público para esperar la confirmación de la transacción
@@ -41,8 +45,6 @@ export async function POST(request: Request) {
 
     // Convertir el balance de wei a ETH (18 decimales)
     const balanceInEth = Number(balance) / 10 ** 18
-
-    console.log(`Received ETH from faucet: https://sepolia.basescan.org/tx/${transactionHash}`)
 
     return NextResponse.json({
       transactionHash,

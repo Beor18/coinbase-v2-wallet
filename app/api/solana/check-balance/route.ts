@@ -1,17 +1,25 @@
 import { NextResponse } from "next/server"
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js"
 
 export async function POST(request: Request) {
   try {
     const { address } = await request.json()
 
-    // En un entorno real, consultaríamos el balance real
-    // Para esta demo, simulamos la respuesta
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    // Validar los parámetros de entrada
+    if (!address) {
+      return NextResponse.json({ error: "Se requiere el parámetro address" }, { status: 400 })
+    }
 
-    // Simulamos un balance
-    const balance = "1.0"
+    // Crear conexión a la red Solana
+    const connection = new Connection("https://api.devnet.solana.com")
 
-    return NextResponse.json({ balance })
+    // Obtener el balance
+    const balance = await connection.getBalance(new PublicKey(address))
+
+    // Convertir de lamports a SOL (9 decimales)
+    const balanceInSol = balance / LAMPORTS_PER_SOL
+
+    return NextResponse.json({ balance: balanceInSol.toString() })
   } catch (error) {
     console.error("Error al verificar el balance:", error)
     return NextResponse.json(

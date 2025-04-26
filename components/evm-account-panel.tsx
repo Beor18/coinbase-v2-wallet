@@ -141,7 +141,7 @@ export function EvmAccountPanel({ apiKeys }: EvmAccountPanelProps) {
         hash: pendingTxHash,
         from: "Faucet",
         to: selectedAccount,
-        amount: "0.05", // Valor estimado
+        amount: "0.05", // Valor estimado que se actualizará con el valor real
         token: "ETH",
         timestamp: new Date().toISOString(),
         status: "pending",
@@ -180,6 +180,7 @@ export function EvmAccountPanel({ apiKeys }: EvmAccountPanelProps) {
                 ...tx,
                 hash: txHash,
                 status: data.confirmed ? "success" : "pending",
+                amount: data.balance, // Actualizar con el balance real
               }
             : tx,
         ),
@@ -207,40 +208,45 @@ export function EvmAccountPanel({ apiKeys }: EvmAccountPanelProps) {
           description: `Transacción: ${txHash.substring(0, 10)}...`,
         })
       } else {
-        // Si no está confirmada, podríamos implementar un polling para verificar el estado
-        // Pero por ahora, asumimos que se confirmará eventualmente
+        // Si no está confirmada, verificamos el estado después de un tiempo
         setTimeout(async () => {
           try {
-            // Verificar si la transacción se ha confirmado
-            const checkResponse = await fetch("/api/evm/wait-for-transaction", {
+            // Verificar el balance actual
+            const checkResponse = await fetch("/api/evm/check-balance", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
+                address: selectedAccount,
                 network: network,
-                hash: txHash,
               }),
             })
 
             if (checkResponse.ok) {
+              const balanceData = await checkResponse.json()
+
               // Actualizar el saldo de la cuenta
               setAccounts((prevAccounts) =>
-                prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: "0.05" } : acc)),
+                prevAccounts.map((acc) =>
+                  acc.address === selectedAccount ? { ...acc, balance: balanceData.balance } : acc,
+                ),
               )
 
               // Actualizar el estado de la transacción
               setTransactions((prevTransactions) =>
-                prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
+                prevTransactions.map((tx) =>
+                  tx.hash === txHash ? { ...tx, status: "success", amount: balanceData.balance } : tx,
+                ),
               )
 
               toast({
                 title: "Fondos recibidos",
-                description: `Transacción: ${txHash.substring(0, 10)}...`,
+                description: `Balance actualizado: ${balanceData.balance} ETH`,
               })
             }
           } catch (checkError) {
-            console.error("Error checking transaction:", checkError)
+            console.error("Error checking balance:", checkError)
           }
         }, 10000) // Verificar después de 10 segundos
       }

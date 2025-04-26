@@ -130,6 +130,22 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
     setError(null)
 
     try {
+      // Añadir transacción al historial como pendiente
+      const pendingTxHash = `pending-${Date.now()}`
+      const pendingTransaction: Transaction = {
+        hash: pendingTxHash,
+        from: "Faucet",
+        to: selectedAccount,
+        amount: "1.0", // Valor estimado que se actualizará con el valor real
+        token: "SOL",
+        timestamp: new Date().toISOString(),
+        status: "pending",
+        type: "receive",
+        network: network,
+      }
+
+      setTransactions([pendingTransaction, ...transactions])
+
       // Llamar a la acción del servidor para solicitar fondos del faucet
       const response = await fetch("/api/solana/request-faucet", {
         method: "POST",
@@ -149,23 +165,22 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       const data = await response.json()
 
-      // Generar un hash de transacción para el historial
-      const txHash = data.signature || "sol-" + Date.now()
+      // Generar un hash de transacción para el historial si no se proporciona
+      const txHash = data.signature || pendingTxHash
 
-      // Añadir transacción al historial
-      const newTransaction: Transaction = {
-        hash: txHash,
-        from: "Faucet",
-        to: selectedAccount,
-        amount: "1.0",
-        token: "SOL",
-        timestamp: new Date().toISOString(),
-        status: "pending",
-        type: "receive",
-        network: network,
-      }
-
-      setTransactions([newTransaction, ...transactions])
+      // Actualizar la transacción pendiente con el hash real
+      setTransactions((prevTransactions) =>
+        prevTransactions.map((tx) =>
+          tx.hash === pendingTxHash
+            ? {
+                ...tx,
+                hash: txHash,
+                status: data.confirmed ? "success" : "pending",
+                amount: data.balance, // Actualizar con el balance real
+              }
+            : tx,
+        ),
+      )
 
       toast({
         title: "Solicitud enviada",
@@ -174,39 +189,61 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       // Si la transacción ya está confirmada en la respuesta
       if (data.confirmed) {
-        // Actualizar el estado de la transacción
-        setTransactions((prevTransactions) =>
-          prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
-        )
-
         // Actualizar el saldo de la cuenta
         setAccounts((prevAccounts) =>
           prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: data.balance } : acc)),
         )
 
+        // Actualizar el estado de la transacción
+        setTransactions((prevTransactions) =>
+          prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
+        )
+
         toast({
           title: "Fondos recibidos",
-          description: "Tu cuenta ha sido financiada con 1 SOL",
+          description: `Balance actualizado: ${data.balance} SOL`,
         })
       } else {
-        // En un entorno real, aquí implementaríamos la función waitForBalance
-        // Para esta demo, simulamos la espera
-        setTimeout(() => {
-          // Actualizar el estado de la transacción
-          setTransactions((prevTransactions) =>
-            prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
-          )
+        // Si no está confirmada, verificamos el estado después de un tiempo
+        setTimeout(async () => {
+          try {
+            // Verificar el balance actual
+            const checkResponse = await fetch("/api/solana/check-balance", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                address: selectedAccount,
+              }),
+            })
 
-          // Actualizar el saldo de la cuenta
-          setAccounts((prevAccounts) =>
-            prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: "1.0" } : acc)),
-          )
+            if (checkResponse.ok) {
+              const balanceData = await checkResponse.json()
 
-          toast({
-            title: "Fondos recibidos",
-            description: "Tu cuenta ha sido financiada con 1 SOL",
-          })
-        }, 5000)
+              // Actualizar el saldo de la cuenta
+              setAccounts((prevAccounts) =>
+                prevAccounts.map((acc) =>
+                  acc.address === selectedAccount ? { ...acc, balance: balanceData.balance } : acc,
+                ),
+              )
+
+              // Actualizar el estado de la transacción
+              setTransactions((prevTransactions) =>
+                prevTransactions.map((tx) =>
+                  tx.hash === txHash ? { ...tx, status: "success", amount: balanceData.balance } : tx,
+                ),
+              )
+
+              toast({
+                title: "Fondos recibidos",
+                description: `Balance actualizado: ${balanceData.balance} SOL`,
+              })
+            }
+          } catch (checkError) {
+            console.error("Error checking balance:", checkError)
+          }
+        }, 10000) // Verificar después de 10 segundos
       }
     } catch (err) {
       console.error("Error requesting funds:", err)
@@ -248,11 +285,11 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
       }
 
       const data = await response.json()
-      const txHash = data.signature || "sol-tx-" + Date.now()
+      const txSignature = data.signature
 
       // Añadir transacción al historial
       const newTransaction: Transaction = {
-        hash: txHash,
+        hash: txSignature,
         from: selectedAccount,
         to: recipientAddress,
         amount: transferAmount,
@@ -279,7 +316,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       toast({
         title: "Transacción enviada",
-        description: `Hash: ${txHash.substring(0, 10)}...`,
+        description: `Firma: ${txSignature.substring(0, 10)}...`,
       })
     } catch (err) {
       console.error("Error sending transaction:", err)

@@ -5,6 +5,11 @@ export async function POST(request: Request) {
   try {
     const { address, token } = await request.json()
 
+    // Validar los parámetros de entrada
+    if (!address || !token) {
+      return NextResponse.json({ error: "Se requieren los parámetros address y token" }, { status: 400 })
+    }
+
     // Importar el SDK de Coinbase de forma dinámica
     const CdpSdk = await import("@coinbase/cdp-sdk")
 
@@ -36,8 +41,6 @@ export async function POST(request: Request) {
 
     // Convertir de lamports a SOL (9 decimales)
     const balanceInSol = balance / LAMPORTS_PER_SOL
-
-    console.log(`Received ${balanceInSol} SOL from faucet for address: ${address}`)
 
     return NextResponse.json({
       confirmed: true,

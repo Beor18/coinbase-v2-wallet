@@ -5,6 +5,11 @@ export async function POST(request: Request) {
   try {
     const { address, to, amount } = await request.json()
 
+    // Validar los parámetros de entrada
+    if (!address || !to || !amount) {
+      return NextResponse.json({ error: "Se requieren los parámetros address, to y amount" }, { status: 400 })
+    }
+
     // Importar el SDK de Coinbase de forma dinámica
     const CdpSdk = await import("@coinbase/cdp-sdk")
 
@@ -55,8 +60,6 @@ export async function POST(request: Request) {
     if (confirmation.value.err) {
       throw new Error(`Transaction failed: ${confirmation.value.err.toString()}`)
     }
-
-    console.log(`Sent ${amount} SOL to ${to}: https://explorer.solana.com/tx/${txSendSignature}?cluster=devnet`)
 
     return NextResponse.json({ signature: txSendSignature })
   } catch (error) {

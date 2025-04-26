@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server"
-import { parseEther, formatEther } from "viem"
+import { parseEther } from "viem"
 
 export async function POST(request: Request) {
   try {
     const { address, network, to, value } = await request.json()
+
+    // Validar los parámetros de entrada
+    if (!address || !network || !to || !value) {
+      return NextResponse.json({ error: "Se requieren los parámetros address, network, to y value" }, { status: 400 })
+    }
 
     // Importar el SDK de Coinbase de forma dinámica
     const CdpSdk = await import("@coinbase/cdp-sdk")
@@ -20,10 +25,6 @@ export async function POST(request: Request) {
         value: parseEther(value),
       },
     })
-
-    console.log(
-      `Sent ${formatEther(parseEther(value))} ETH to ${to}: https://sepolia.basescan.org/tx/${txResult.transactionHash}`,
-    )
 
     return NextResponse.json({ transactionHash: txResult.transactionHash })
   } catch (error) {

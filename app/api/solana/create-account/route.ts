@@ -10,7 +10,6 @@ export async function POST(request: Request) {
 
     // Crear una cuenta Solana usando el SDK
     const account = await cdp.solana.createAccount()
-    console.log(`Created Solana account: ${account.address}`)
 
     return NextResponse.json({ address: account.address })
   } catch (error) {
