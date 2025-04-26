@@ -48,7 +48,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const { toast } = useToast()
 
-  // Cargar cuentas desde localStorage al montar el componente
+  // Load accounts from localStorage when mounting the component
   useEffect(() => {
     const storedAccounts = localStorage.getItem("solana_accounts")
     if (storedAccounts) {
@@ -61,14 +61,14 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
     }
   }, [])
 
-  // Guardar cuentas en localStorage cuando cambien
+  // Save accounts to localStorage when they change
   useEffect(() => {
     if (accounts.length > 0) {
       localStorage.setItem("solana_accounts", JSON.stringify(accounts))
     }
   }, [accounts])
 
-  // Guardar transacciones en localStorage cuando cambien
+  // Save transactions to localStorage when they change
   useEffect(() => {
     if (transactions.length > 0) {
       localStorage.setItem("solana_transactions", JSON.stringify(transactions))
@@ -80,7 +80,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
     setError(null)
 
     try {
-      // Llamar a la acción del servidor para crear una cuenta Solana
+      // Call the server action to create a Solana account
       const response = await fetch("/api/solana/create-account", {
         method: "POST",
         headers: {
@@ -91,7 +91,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || "Error al crear la cuenta")
+        throw new Error(errorData.error || "Error creating account")
       }
 
       const data = await response.json()
@@ -106,17 +106,17 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
       setSelectedAccount(data.address)
 
       toast({
-        title: "Cuenta creada",
-        description: `Dirección: ${data.address.substring(0, 10)}...`,
+        title: "Account created",
+        description: `Address: ${data.address.substring(0, 10)}...`,
       })
     } catch (err) {
       console.error("Error creating account:", err)
-      setError(err instanceof Error ? err.message : "Error al crear la cuenta")
+      setError(err instanceof Error ? err.message : "Error creating account")
 
       toast({
         variant: "destructive",
         title: "Error",
-        description: err instanceof Error ? err.message : "Error al crear la cuenta",
+        description: err instanceof Error ? err.message : "Error creating account",
       })
     } finally {
       setLoading(null)
@@ -130,13 +130,13 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
     setError(null)
 
     try {
-      // Añadir transacción al historial como pendiente
+      // Add transaction to history as pending
       const pendingTxHash = `pending-${Date.now()}`
       const pendingTransaction: Transaction = {
         hash: pendingTxHash,
         from: "Faucet",
         to: selectedAccount,
-        amount: "1.0", // Valor estimado que se actualizará con el valor real
+        amount: "1.0", // Estimated value that will be updated with the real value
         token: "SOL",
         timestamp: new Date().toISOString(),
         status: "pending",
@@ -146,7 +146,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       setTransactions([pendingTransaction, ...transactions])
 
-      // Llamar a la acción del servidor para solicitar fondos del faucet
+      // Call the server action to request funds from the faucet
       const response = await fetch("/api/solana/request-faucet", {
         method: "POST",
         headers: {
@@ -160,15 +160,15 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || "Error al solicitar fondos")
+        throw new Error(errorData.error || "Error requesting funds")
       }
 
       const data = await response.json()
 
-      // Generar un hash de transacción para el historial si no se proporciona
+      // Generate a transaction hash for the history if not provided
       const txHash = data.signature || pendingTxHash
 
-      // Actualizar la transacción pendiente con el hash real
+      // Update the pending transaction with the real hash
       setTransactions((prevTransactions) =>
         prevTransactions.map((tx) =>
           tx.hash === pendingTxHash
@@ -176,38 +176,38 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
                 ...tx,
                 hash: txHash,
                 status: data.confirmed ? "success" : "pending",
-                amount: data.balance, // Actualizar con el balance real
+                amount: data.balance, // Update with the real balance
               }
             : tx,
         ),
       )
 
       toast({
-        title: "Solicitud enviada",
-        description: "Esperando confirmación de la transacción...",
+        title: "Request sent",
+        description: "Waiting for transaction confirmation...",
       })
 
-      // Si la transacción ya está confirmada en la respuesta
+      // If the transaction is already confirmed in the response
       if (data.confirmed) {
-        // Actualizar el saldo de la cuenta
+        // Update the account balance
         setAccounts((prevAccounts) =>
           prevAccounts.map((acc) => (acc.address === selectedAccount ? { ...acc, balance: data.balance } : acc)),
         )
 
-        // Actualizar el estado de la transacción
+        // Update the transaction status
         setTransactions((prevTransactions) =>
           prevTransactions.map((tx) => (tx.hash === txHash ? { ...tx, status: "success" } : tx)),
         )
 
         toast({
-          title: "Fondos recibidos",
-          description: `Balance actualizado: ${data.balance} SOL`,
+          title: "Funds received",
+          description: `Updated balance: ${data.balance} SOL`,
         })
       } else {
-        // Si no está confirmada, verificamos el estado después de un tiempo
+        // If not confirmed, we check the status after some time
         setTimeout(async () => {
           try {
-            // Verificar el balance actual
+            // Check the current balance
             const checkResponse = await fetch("/api/solana/check-balance", {
               method: "POST",
               headers: {
@@ -221,14 +221,14 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
             if (checkResponse.ok) {
               const balanceData = await checkResponse.json()
 
-              // Actualizar el saldo de la cuenta
+              // Update the account balance
               setAccounts((prevAccounts) =>
                 prevAccounts.map((acc) =>
                   acc.address === selectedAccount ? { ...acc, balance: balanceData.balance } : acc,
                 ),
               )
 
-              // Actualizar el estado de la transacción
+              // Update the transaction status
               setTransactions((prevTransactions) =>
                 prevTransactions.map((tx) =>
                   tx.hash === txHash ? { ...tx, status: "success", amount: balanceData.balance } : tx,
@@ -236,23 +236,23 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
               )
 
               toast({
-                title: "Fondos recibidos",
-                description: `Balance actualizado: ${balanceData.balance} SOL`,
+                title: "Funds received",
+                description: `Updated balance: ${balanceData.balance} SOL`,
               })
             }
           } catch (checkError) {
             console.error("Error checking balance:", checkError)
           }
-        }, 10000) // Verificar después de 10 segundos
+        }, 10000) // Check after 10 seconds
       }
     } catch (err) {
       console.error("Error requesting funds:", err)
-      setError(err instanceof Error ? err.message : "Error al solicitar fondos")
+      setError(err instanceof Error ? err.message : "Error requesting funds")
 
       toast({
         variant: "destructive",
         title: "Error",
-        description: err instanceof Error ? err.message : "Error al solicitar fondos",
+        description: err instanceof Error ? err.message : "Error requesting funds",
       })
     } finally {
       setLoading(null)
@@ -266,7 +266,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
     setError(null)
 
     try {
-      // Llamar a la acción del servidor para enviar la transacción
+      // Call the server action to send the transaction
       const response = await fetch("/api/solana/send-transaction", {
         method: "POST",
         headers: {
@@ -281,13 +281,13 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || "Error al enviar la transacción")
+        throw new Error(errorData.error || "Error sending transaction")
       }
 
       const data = await response.json()
       const txSignature = data.signature
 
-      // Añadir transacción al historial
+      // Add transaction to history
       const newTransaction: Transaction = {
         hash: txSignature,
         from: selectedAccount,
@@ -302,7 +302,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       setTransactions([newTransaction, ...transactions])
 
-      // Actualizar el saldo de la cuenta
+      // Update the account balance
       const amount = Number.parseFloat(transferAmount)
       const selectedAccountObj = accounts.find((acc) => acc.address === selectedAccount)
 
@@ -315,17 +315,17 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
       setTransferAmount("")
 
       toast({
-        title: "Transacción enviada",
-        description: `Firma: ${txSignature.substring(0, 10)}...`,
+        title: "Transaction sent",
+        description: `Signature: ${txSignature.substring(0, 10)}...`,
       })
     } catch (err) {
       console.error("Error sending transaction:", err)
-      setError(err instanceof Error ? err.message : "Error al enviar la transacción")
+      setError(err instanceof Error ? err.message : "Error sending transaction")
 
       toast({
         variant: "destructive",
         title: "Error",
-        description: err instanceof Error ? err.message : "Error al enviar la transacción",
+        description: err instanceof Error ? err.message : "Error sending transaction",
       })
     } finally {
       setLoading(null)
@@ -339,8 +339,8 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
     toast({
-      title: "Copiado al portapapeles",
-      description: "La dirección ha sido copiada",
+      title: "Copied to clipboard",
+      description: "The address has been copied",
     })
   }
 
@@ -353,15 +353,15 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="md:col-span-1">
           <CardHeader>
-            <CardTitle>Cuentas Solana</CardTitle>
-            <CardDescription>Crea y gestiona cuentas Solana</CardDescription>
+            <CardTitle>Solana Accounts</CardTitle>
+            <CardDescription>Create and manage Solana accounts</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label>Red</Label>
+              <Label>Network</Label>
               <Select value={network} onValueChange={setNetwork}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecciona una red" />
+                  <SelectValue placeholder="Select a network" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="devnet">Devnet</SelectItem>
@@ -371,13 +371,13 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
             </div>
 
             <div className="space-y-2">
-              <Label>Cuentas disponibles</Label>
+              <Label>Available accounts</Label>
               {accounts.length === 0 ? (
-                <div className="text-sm text-muted-foreground py-2">No hay cuentas creadas</div>
+                <div className="text-sm text-muted-foreground py-2">No accounts created</div>
               ) : (
                 <Select value={selectedAccount || undefined} onValueChange={setSelectedAccount}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecciona una cuenta" />
+                    <SelectValue placeholder="Select an account" />
                   </SelectTrigger>
                   <SelectContent>
                     {accounts.map((account) => (
@@ -401,15 +401,15 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
               ) : (
                 <Plus className="mr-2 h-4 w-4" />
               )}
-              Crear cuenta Solana
+              Create Solana account
             </Button>
           </CardContent>
         </Card>
 
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle>Detalles de la cuenta</CardTitle>
-            <CardDescription>Gestiona tu cuenta y realiza transacciones</CardDescription>
+            <CardTitle>Account Details</CardTitle>
+            <CardDescription>Manage your account and make transactions</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             {error && (
@@ -422,13 +422,13 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
             {!selectedAccount ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <Wallet className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No hay cuenta seleccionada</h3>
-                <p className="text-sm text-muted-foreground mt-1">Crea o selecciona una cuenta para ver sus detalles</p>
+                <h3 className="text-lg font-medium">No account selected</h3>
+                <p className="text-sm text-muted-foreground mt-1">Create or select an account to view its details</p>
               </div>
             ) : (
               <>
                 <div>
-                  <Label className="text-sm text-muted-foreground">Dirección</Label>
+                  <Label className="text-sm text-muted-foreground">Address</Label>
                   <div className="flex items-center mt-1">
                     <code className="bg-muted px-2 py-1 rounded text-sm font-mono break-all flex-1">
                       {getSelectedAccount()?.address}
@@ -456,12 +456,12 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
                     {loading === "faucet" ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Solicitando fondos...
+                        Requesting funds...
                       </>
                     ) : (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4" />
-                        Solicitar SOL del faucet
+                        Request SOL from faucet
                       </>
                     )}
                   </Button>
@@ -470,20 +470,20 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
                 {Number.parseFloat(getSelectedAccount()?.balance || "0") > 0 && (
                   <div className="space-y-4">
                     <Separator />
-                    <h3 className="font-medium">Enviar fondos</h3>
+                    <h3 className="font-medium">Send funds</h3>
 
                     <div className="space-y-2">
-                      <Label htmlFor="recipient">Dirección del destinatario</Label>
+                      <Label htmlFor="recipient">Recipient address</Label>
                       <Input
                         id="recipient"
-                        placeholder="Dirección Solana..."
+                        placeholder="Solana address..."
                         value={recipientAddress}
                         onChange={(e) => setRecipientAddress(e.target.value)}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="amount">Cantidad (SOL)</Label>
+                      <Label htmlFor="amount">Amount (SOL)</Label>
                       <Input
                         id="amount"
                         type="number"
@@ -504,12 +504,12 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
                       {loading === "transfer" ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Enviando transacción...
+                          Sending transaction...
                         </>
                       ) : (
                         <>
                           <Send className="mr-2 h-4 w-4" />
-                          Enviar fondos
+                          Send funds
                         </>
                       )}
                     </Button>
@@ -523,32 +523,32 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Historial de transacciones</CardTitle>
-          <CardDescription>Visualiza todas las transacciones realizadas</CardDescription>
+          <CardTitle>Transaction History</CardTitle>
+          <CardDescription>View all transactions made</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             {transactions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No hay transacciones para mostrar</div>
+              <div className="text-center py-8 text-muted-foreground">No transactions to show</div>
             ) : (
               <table className="w-full">
                 <thead>
                   <tr className="border-b">
                     <th className="text-left py-2 px-2 font-medium">Hash</th>
-                    <th className="text-left py-2 px-2 font-medium">Tipo</th>
-                    <th className="text-left py-2 px-2 font-medium">De</th>
-                    <th className="text-left py-2 px-2 font-medium">A</th>
-                    <th className="text-left py-2 px-2 font-medium">Cantidad</th>
-                    <th className="text-left py-2 px-2 font-medium">Fecha</th>
-                    <th className="text-left py-2 px-2 font-medium">Estado</th>
-                    <th className="text-left py-2 px-2 font-medium">Explorador</th>
+                    <th className="text-left py-2 px-2 font-medium">Type</th>
+                    <th className="text-left py-2 px-2 font-medium">From</th>
+                    <th className="text-left py-2 px-2 font-medium">To</th>
+                    <th className="text-left py-2 px-2 font-medium">Amount</th>
+                    <th className="text-left py-2 px-2 font-medium">Date</th>
+                    <th className="text-left py-2 px-2 font-medium">Status</th>
+                    <th className="text-left py-2 px-2 font-medium">Explorer</th>
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((tx, index) => (
                     <tr key={index} className="border-b hover:bg-muted/50">
                       <td className="py-2 px-2 font-mono text-xs">{tx.hash.substring(0, 10)}...</td>
-                      <td className="py-2 px-2">{tx.type === "send" ? "Envío" : "Recepción"}</td>
+                      <td className="py-2 px-2">{tx.type === "send" ? "Send" : "Receive"}</td>
                       <td className="py-2 px-2">
                         {tx.from === "Faucet"
                           ? "Faucet"
@@ -559,7 +559,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
                         {tx.amount} {tx.token}
                       </td>
                       <td className="py-2 px-2 text-sm">{new Date(tx.timestamp).toLocaleString()}</td>
-                      <td className="py-2 px-2">{tx.status === "success" ? "Completada" : "Pendiente"}</td>
+                      <td className="py-2 px-2">{tx.status === "success" ? "Completed" : "Pending"}</td>
                       <td className="py-2 px-2">
                         {tx.status === "success" && (
                           <a
@@ -568,7 +568,7 @@ export function SolanaAccountPanel({ apiKeys }: SolanaAccountPanelProps) {
                             rel="noopener noreferrer"
                             className="inline-flex items-center text-sm text-primary hover:underline"
                           >
-                            Ver <ExternalLink className="ml-1 h-3 w-3" />
+                            View <ExternalLink className="ml-1 h-3 w-3" />
                           </a>
                         )}
                       </td>
