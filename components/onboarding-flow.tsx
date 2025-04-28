@@ -14,8 +14,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   const steps = [
     {
-      title: "Bienvenido a tu Billetera Digital",
-      description: "Una forma sencilla de gestionar tus activos digitales",
+      title: "Welcome to your Digital Wallet",
+      description: "A simple way to manage your digital assets",
       content: (
         <div className="space-y-6 py-8">
           <div className="flex justify-center">
@@ -25,75 +25,75 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
 
           <div className="space-y-4 text-center">
-            <h3 className="text-xl font-medium">¿Qué es una billetera digital?</h3>
+            <h3 className="text-xl font-medium">What is a digital wallet?</h3>
             <p className="text-muted-foreground">
-              Una billetera digital es como tu cuenta bancaria en el mundo de las criptomonedas. Te permite guardar,
-              enviar y recibir activos digitales de forma segura.
+              A digital wallet is like your bank account in the world of cryptocurrencies. It allows you to store, send,
+              and receive digital assets securely.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 border rounded-lg text-center">
               <Shield className="h-8 w-8 mx-auto mb-2 text-primary" />
-              <h4 className="font-medium">Segura</h4>
-              <p className="text-sm text-muted-foreground">Tus activos están protegidos con la mejor tecnología</p>
+              <h4 className="font-medium">Secure</h4>
+              <p className="text-sm text-muted-foreground">Your assets are protected with the best technology</p>
             </div>
             <div className="p-4 border rounded-lg text-center">
               <Coins className="h-8 w-8 mx-auto mb-2 text-primary" />
-              <h4 className="font-medium">Versátil</h4>
-              <p className="text-sm text-muted-foreground">Compatible con múltiples tipos de activos digitales</p>
+              <h4 className="font-medium">Versatile</h4>
+              <p className="text-sm text-muted-foreground">Compatible with multiple types of digital assets</p>
             </div>
             <div className="p-4 border rounded-lg text-center">
               <Check className="h-8 w-8 mx-auto mb-2 text-primary" />
-              <h4 className="font-medium">Fácil de usar</h4>
-              <p className="text-sm text-muted-foreground">Diseñada para ser intuitiva incluso si eres principiante</p>
+              <h4 className="font-medium">Easy to use</h4>
+              <p className="text-sm text-muted-foreground">Designed to be intuitive even if you're a beginner</p>
             </div>
           </div>
         </div>
       ),
     },
     {
-      title: "Crea tu primera cuenta",
-      description: "Elige el tipo de cuenta que deseas crear",
+      title: "Create your first account",
+      description: "Choose the type of account you want to create",
       content: (
         <div className="space-y-6 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="border rounded-lg p-6 hover:border-primary cursor-pointer">
-              <h3 className="text-xl font-medium mb-2">Cuenta Ethereum</h3>
+              <h3 className="text-xl font-medium mb-2">Ethereum Account</h3>
               <p className="text-muted-foreground mb-4">
-                Ideal para interactuar con aplicaciones y servicios basados en Ethereum.
+                Ideal for interacting with applications and services based on Ethereum.
               </p>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center">
                   <Check className="h-4 w-4 mr-2 text-green-500" />
-                  Compatible con miles de aplicaciones
+                  Compatible with thousands of applications
                 </li>
                 <li className="flex items-center">
                   <Check className="h-4 w-4 mr-2 text-green-500" />
-                  Soporte para tokens populares
+                  Support for popular tokens
                 </li>
                 <li className="flex items-center">
                   <Check className="h-4 w-4 mr-2 text-green-500" />
-                  Tarifas de transacción moderadas
+                  Moderate transaction fees
                 </li>
               </ul>
             </div>
 
             <div className="border rounded-lg p-6 hover:border-primary cursor-pointer">
-              <h3 className="text-xl font-medium mb-2">Cuenta Solana</h3>
-              <p className="text-muted-foreground mb-4">Perfecta para transacciones rápidas y de bajo costo.</p>
+              <h3 className="text-xl font-medium mb-2">Solana Account</h3>
+              <p className="text-muted-foreground mb-4">Perfect for fast and low-cost transactions.</p>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center">
                   <Check className="h-4 w-4 mr-2 text-green-500" />
-                  Transacciones ultra rápidas
+                  Ultra-fast transactions
                 </li>
                 <li className="flex items-center">
                   <Check className="h-4 w-4 mr-2 text-green-500" />
-                  Tarifas de transacción muy bajas
+                  Very low transaction fees
                 </li>
                 <li className="flex items-center">
                   <Check className="h-4 w-4 mr-2 text-green-500" />
-                  Ecosistema en crecimiento
+                  Growing ecosystem
                 </li>
               </ul>
             </div>
@@ -101,16 +101,16 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
           <div className="bg-muted p-4 rounded-lg">
             <p className="text-sm">
-              <strong>Consejo:</strong> Si eres principiante, te recomendamos comenzar con una cuenta Ethereum en la red
-              de prueba. Así podrás practicar sin usar dinero real.
+              <strong>Tip:</strong> If you're a beginner, we recommend starting with an Ethereum account on the test
+              network. This way you can practice without using real money.
             </p>
           </div>
         </div>
       ),
     },
     {
-      title: "¡Todo listo!",
-      description: "Tu billetera digital está configurada y lista para usar",
+      title: "All set!",
+      description: "Your digital wallet is configured and ready to use",
       content: (
         <div className="space-y-6 py-8 text-center">
           <div className="flex justify-center">
@@ -120,27 +120,26 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
 
           <div>
-            <h3 className="text-xl font-medium">¡Felicidades!</h3>
+            <h3 className="text-xl font-medium">Congratulations!</h3>
             <p className="text-muted-foreground mt-2">
-              Has configurado correctamente tu billetera digital. Ahora puedes comenzar a explorar el mundo de los
-              activos digitales.
+              You have successfully set up your digital wallet. Now you can start exploring the world of digital assets.
             </p>
           </div>
 
           <div className="bg-muted p-4 rounded-lg text-left">
-            <h4 className="font-medium mb-2">Próximos pasos:</h4>
+            <h4 className="font-medium mb-2">Next steps:</h4>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <Check className="h-4 w-4 mr-2 text-green-500" />
-                Obtén fondos de prueba gratuitos para experimentar
+                Get free test funds to experiment
               </li>
               <li className="flex items-center">
                 <Check className="h-4 w-4 mr-2 text-green-500" />
-                Realiza tu primera transacción
+                Make your first transaction
               </li>
               <li className="flex items-center">
                 <Check className="h-4 w-4 mr-2 text-green-500" />
-                Explora las aplicaciones compatibles
+                Explore compatible applications
               </li>
             </ul>
           </div>
@@ -161,7 +160,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         <CardContent>{currentStep.content}</CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
-            Atrás
+            Back
           </Button>
 
           <Button
@@ -175,10 +174,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           >
             {step < steps.length - 1 ? (
               <>
-                Siguiente <ArrowRight className="ml-2 h-4 w-4" />
+                Next <ArrowRight className="ml-2 h-4 w-4" />
               </>
             ) : (
-              "Comenzar"
+              "Start"
             )}
           </Button>
         </CardFooter>

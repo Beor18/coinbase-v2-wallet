@@ -27,13 +27,13 @@ export function WalletDashboard() {
       address: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
       balance: "0.05",
       token: "ETH",
-      network: "Red de Prueba (Sepolia)",
+      network: "Test Network (Sepolia)",
     },
     solana: {
       address: "8ZUczUAUSLX5QT4xkJNAK9PbfQC6cGLPAKLvJZKKpRs9",
       balance: "1.0",
       token: "SOL",
-      network: "Red de Prueba (Devnet)",
+      network: "Test Network (Devnet)",
     },
   }
 
@@ -52,15 +52,15 @@ export function WalletDashboard() {
         <Card className="md:col-span-2">
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Mi Cuenta</CardTitle>
+              <CardTitle>My Account</CardTitle>
               <div className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">{currentAccount.network}</div>
             </div>
-            <CardDescription>Gestiona tus activos digitales</CardDescription>
+            <CardDescription>Manage your digital assets</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
               <div>
-                <Label className="text-muted-foreground">Dirección de la billetera</Label>
+                <Label className="text-muted-foreground">Wallet Address</Label>
                 <div className="flex items-center mt-1">
                   <code className="bg-muted px-3 py-1 rounded text-sm font-mono flex-1 overflow-x-auto">
                     {currentAccount.address}
@@ -70,7 +70,7 @@ export function WalletDashboard() {
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Esta es la dirección única de tu billetera. Compártela para recibir fondos.
+                  This is the unique address of your wallet. Share it to receive funds.
                 </p>
               </div>
 
@@ -81,18 +81,18 @@ export function WalletDashboard() {
                   <span className="ml-2 text-xl">{currentAccount.token}</span>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Estás usando una red de prueba. Estos fondos no tienen valor real.
+                  You are using a test network. These funds have no real value.
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button className="flex-1" onClick={() => setShowSendDialog(true)}>
                   <ArrowUpRight className="mr-2 h-4 w-4" />
-                  Enviar
+                  Send
                 </Button>
                 <Button className="flex-1" variant="outline" onClick={() => setShowReceiveDialog(true)}>
                   <ArrowDownRight className="mr-2 h-4 w-4" />
-                  Recibir
+                  Receive
                 </Button>
                 <TooltipProvider>
                   <Tooltip>
@@ -102,7 +102,7 @@ export function WalletDashboard() {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Obtener fondos de prueba</p>
+                      <p>Get test funds</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -113,32 +113,32 @@ export function WalletDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Guía Rápida</CardTitle>
-            <CardDescription>Aprende a usar tu billetera</CardDescription>
+            <CardTitle>Quick Guide</CardTitle>
+            <CardDescription>Learn how to use your wallet</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="p-3 border rounded-lg">
                 <h3 className="font-medium flex items-center">
                   <Info className="h-4 w-4 mr-2 text-primary" />
-                  ¿Qué es {activeTab === "ethereum" ? "Ethereum" : "Solana"}?
+                  What is {activeTab === "ethereum" ? "Ethereum" : "Solana"}?
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
                   {activeTab === "ethereum"
-                    ? "Ethereum es una plataforma blockchain que permite crear aplicaciones descentralizadas y tokens digitales."
-                    : "Solana es una blockchain de alta velocidad y bajo costo, ideal para aplicaciones que requieren rapidez."}
+                    ? "Ethereum is a blockchain platform that allows creating decentralized applications and digital tokens."
+                    : "Solana is a high-speed, low-cost blockchain, ideal for applications that require speed."}
                 </p>
               </div>
 
               <div className="p-3 border rounded-lg">
                 <h3 className="font-medium flex items-center">
                   <Info className="h-4 w-4 mr-2 text-primary" />
-                  ¿Qué puedo hacer?
+                  What can I do?
                 </h3>
                 <ul className="text-sm text-muted-foreground mt-1 space-y-1">
-                  <li>• Enviar y recibir activos digitales</li>
-                  <li>• Interactuar con aplicaciones</li>
-                  <li>• Almacenar tokens digitales</li>
+                  <li>• Send and receive digital assets</li>
+                  <li>• Interact with applications</li>
+                  <li>• Store digital tokens</li>
                 </ul>
               </div>
 
@@ -146,36 +146,36 @@ export function WalletDashboard() {
                 <DialogTrigger asChild>
                   <Button variant="link" className="w-full justify-start p-0 h-auto">
                     <HelpCircle className="h-4 w-4 mr-2" />
-                    Ver más ayuda
+                    View more help
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Centro de Ayuda</DialogTitle>
-                    <DialogDescription>Guías y recursos para usar tu billetera digital</DialogDescription>
+                    <DialogTitle>Help Center</DialogTitle>
+                    <DialogDescription>Guides and resources for using your digital wallet</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 mt-4">
                     <div className="p-3 border rounded-lg">
-                      <h3 className="font-medium">¿Qué es una red de prueba?</h3>
+                      <h3 className="font-medium">What is a test network?</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Las redes de prueba son versiones de blockchain que funcionan igual que las principales, pero
-                        los activos no tienen valor real. Son perfectas para aprender y experimentar.
+                        Test networks are versions of blockchain that work just like the main ones, but the assets have
+                        no real value. They're perfect for learning and experimenting.
                       </p>
                     </div>
 
                     <div className="p-3 border rounded-lg">
-                      <h3 className="font-medium">¿Cómo obtengo fondos reales?</h3>
+                      <h3 className="font-medium">How do I get real funds?</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Para usar fondos reales, necesitarás cambiar a una red principal y adquirir criptomonedas a
-                        través de un exchange como Coinbase.
+                        To use real funds, you'll need to switch to a main network and acquire cryptocurrencies through
+                        an exchange like Coinbase.
                       </p>
                     </div>
 
                     <div className="p-3 border rounded-lg">
-                      <h3 className="font-medium">¿Qué es una dirección de billetera?</h3>
+                      <h3 className="font-medium">What is a wallet address?</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Es como tu número de cuenta bancaria en el mundo cripto. Compártela para recibir fondos, pero
-                        nunca compartas tus claves privadas o frases de recuperación.
+                        It's like your bank account number in the crypto world. Share it to receive funds, but never
+                        share your private keys or recovery phrases.
                       </p>
                     </div>
                   </div>
@@ -207,26 +207,24 @@ function SendDialog({ open, onOpenChange, account }: DialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Enviar {account.token}</DialogTitle>
-          <DialogDescription>Envía fondos a otra dirección de billetera</DialogDescription>
+          <DialogTitle>Send {account.token}</DialogTitle>
+          <DialogDescription>Send funds to another wallet address</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="recipient">Dirección del destinatario</Label>
+            <Label htmlFor="recipient">Recipient address</Label>
             <Input
               id="recipient"
               placeholder={account.address.substring(0, 10) + "..."}
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground">
-              Introduce la dirección completa de la billetera del destinatario
-            </p>
+            <p className="text-xs text-muted-foreground">Enter the complete address of the recipient's wallet</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">Cantidad a enviar</Label>
+            <Label htmlFor="amount">Amount to send</Label>
             <div className="flex">
               <Input
                 id="amount"
@@ -241,24 +239,24 @@ function SendDialog({ open, onOpenChange, account }: DialogProps) {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Balance disponible: {account.balance} {account.token}
+              Available balance: {account.balance} {account.token}
             </p>
           </div>
 
           <div className="bg-muted p-3 rounded-md">
             <h4 className="text-sm font-medium flex items-center">
               <Info className="h-4 w-4 mr-2" />
-              Información importante
+              Important information
             </h4>
             <p className="text-xs text-muted-foreground mt-1">
-              • Verifica siempre la dirección del destinatario antes de enviar
-              <br />• Las transacciones en blockchain son irreversibles
-              <br />• Estás usando una red de prueba ({account.network})
+              • Always verify the recipient's address before sending
+              <br />• Blockchain transactions are irreversible
+              <br />• You are using a test network ({account.network})
             </p>
           </div>
 
           <Button className="w-full" disabled={!amount || !recipient}>
-            Enviar {amount ? `${amount} ${account.token}` : ""}
+            Send {amount ? `${amount} ${account.token}` : ""}
           </Button>
         </div>
       </DialogContent>
@@ -271,19 +269,19 @@ function ReceiveDialog({ open, onOpenChange, account }: DialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Recibir {account.token}</DialogTitle>
-          <DialogDescription>Comparte tu dirección para recibir fondos</DialogDescription>
+          <DialogTitle>Receive {account.token}</DialogTitle>
+          <DialogDescription>Share your address to receive funds</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
           <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center">
             <div className="w-48 h-48 bg-muted flex items-center justify-center mb-4">
-              {/* Aquí iría un código QR */}
-              <div className="text-center text-muted-foreground">Código QR de tu dirección</div>
+              {/* QR code would go here */}
+              <div className="text-center text-muted-foreground">QR code of your address</div>
             </div>
 
             <div className="text-center">
-              <p className="text-sm font-medium">Tu dirección de {account.token === "ETH" ? "Ethereum" : "Solana"}</p>
+              <p className="text-sm font-medium">Your {account.token === "ETH" ? "Ethereum" : "Solana"} address</p>
               <code className="text-xs bg-muted px-2 py-1 rounded mt-1 block overflow-x-auto">{account.address}</code>
             </div>
           </div>
@@ -291,22 +289,22 @@ function ReceiveDialog({ open, onOpenChange, account }: DialogProps) {
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1">
               <Copy className="h-4 w-4 mr-2" />
-              Copiar dirección
+              Copy address
             </Button>
             <Button variant="outline" className="flex-1">
-              Compartir
+              Share
             </Button>
           </div>
 
           <div className="bg-muted p-3 rounded-md">
             <h4 className="text-sm font-medium flex items-center">
               <Info className="h-4 w-4 mr-2" />
-              Información importante
+              Important information
             </h4>
             <p className="text-xs text-muted-foreground mt-1">
-              • Comparte esta dirección para recibir {account.token}
-              <br />• Asegúrate de que quien te envía use la red correcta ({account.network})
-              <br />• Nunca compartas tus claves privadas o frases de recuperación
+              • Share this address to receive {account.token}
+              <br />• Make sure the sender uses the correct network ({account.network})
+              <br />• Never share your private keys or recovery phrases
             </p>
           </div>
         </div>

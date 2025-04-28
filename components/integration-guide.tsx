@@ -9,15 +9,15 @@ export function IntegrationGuide() {
   const [activeTab, setActiveTab] = useState("quickstart")
 
   const codeExamples = {
-    createAccount: `// Crear una cuenta Ethereum
+    createAccount: `// Create an Ethereum account
 import { CdpClient } from "@coinbase/cdp-sdk";
 
 const cdp = new CdpClient();
 
 const evmAccount = await cdp.evm.createAccount();
-console.log(\`Cuenta creada: \${evmAccount.address}\`);`,
+console.log(\`Account created: \${evmAccount.address}\`);`,
 
-    requestFunds: `// Solicitar fondos de prueba
+    requestFunds: `// Request test funds
 import { CdpClient } from "@coinbase/cdp-sdk";
 
 const cdp = new CdpClient();
@@ -28,9 +28,9 @@ const { transactionHash } = await cdp.evm.requestFaucet({
   token: "eth",
 });
 
-console.log(\`Fondos solicitados: \${transactionHash}\`);`,
+console.log(\`Funds requested: \${transactionHash}\`);`,
 
-    sendTransaction: `// Enviar una transacción
+    sendTransaction: `// Send a transaction
 import { CdpClient } from "@coinbase/cdp-sdk";
 import { parseEther } from "viem";
 
@@ -45,9 +45,9 @@ const txResult = await cdp.evm.sendTransaction({
   },
 });
 
-console.log(\`Transacción enviada: \${txResult.transactionHash}\`);`,
+console.log(\`Transaction sent: \${txResult.transactionHash}\`);`,
 
-    smartAccount: `// Crear una cuenta inteligente
+    smartAccount: `// Create a smart account
 import { CdpClient } from "@coinbase/cdp-sdk";
 
 const cdp = new CdpClient();
@@ -57,58 +57,58 @@ const smartAccount = await cdp.evm.createSmartAccount({
   owner: evmAccount,
 });
 
-console.log(\`Cuenta inteligente creada: \${smartAccount.address}\`);`,
+console.log(\`Smart account created: \${smartAccount.address}\`);`,
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Guía para Desarrolladores</h2>
-        <p className="text-muted-foreground mt-1">Integra la API de Coinbase v2 Wallet en tu aplicación</p>
+        <h2 className="text-2xl font-bold">Developer Guide</h2>
+        <p className="text-muted-foreground mt-1">Integrate the Coinbase v2 Wallet API into your application</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="quickstart">Inicio Rápido</TabsTrigger>
-          <TabsTrigger value="examples">Ejemplos</TabsTrigger>
+          <TabsTrigger value="quickstart">Quick Start</TabsTrigger>
+          <TabsTrigger value="examples">Examples</TabsTrigger>
           <TabsTrigger value="sdk">SDK</TabsTrigger>
           <TabsTrigger value="widgets">Widgets</TabsTrigger>
         </TabsList>
 
         <TabsContent value="quickstart" className="space-y-6 py-4">
           <div>
-            <h3 className="text-lg font-medium">Primeros pasos</h3>
+            <h3 className="text-lg font-medium">Getting Started</h3>
             <p className="text-muted-foreground mt-1">
-              Sigue estos pasos para integrar la API de Coinbase v2 Wallet en tu aplicación.
+              Follow these steps to integrate the Coinbase v2 Wallet API into your application.
             </p>
           </div>
 
           <div className="space-y-4">
             <div className="p-4 border rounded-lg">
-              <h4 className="font-medium">1. Instalación</h4>
+              <h4 className="font-medium">1. Installation</h4>
               <div className="mt-2 bg-muted p-2 rounded">
                 <code>npm install @coinbase/cdp-sdk</code>
               </div>
             </div>
 
             <div className="p-4 border rounded-lg">
-              <h4 className="font-medium">2. Configuración</h4>
+              <h4 className="font-medium">2. Configuration</h4>
               <p className="text-sm text-muted-foreground mt-1">
-                Configura las variables de entorno con tus credenciales:
+                Configure environment variables with your credentials:
               </p>
               <div className="mt-2 bg-muted p-2 rounded">
                 <code>
-                  export CDP_API_KEY_ID=tu-api-key-id
+                  export CDP_API_KEY_ID=your-api-key-id
                   <br />
-                  export CDP_API_KEY_SECRET=tu-api-key-secret
+                  export CDP_API_KEY_SECRET=your-api-key-secret
                   <br />
-                  export CDP_WALLET_SECRET=tu-wallet-secret
+                  export CDP_WALLET_SECRET=your-wallet-secret
                 </code>
               </div>
             </div>
 
             <div className="p-4 border rounded-lg">
-              <h4 className="font-medium">3. Crear una cuenta</h4>
+              <h4 className="font-medium">3. Create an account</h4>
               <div className="mt-2">
                 <CopyBlock
                   text={codeExamples.createAccount}
@@ -122,19 +122,19 @@ console.log(\`Cuenta inteligente creada: \${smartAccount.address}\`);`,
           </div>
 
           <Button variant="outline" className="w-full">
-            Ver documentación completa
+            View complete documentation
           </Button>
         </TabsContent>
 
         <TabsContent value="examples" className="space-y-6 py-4">
           <div>
-            <h3 className="text-lg font-medium">Ejemplos de código</h3>
-            <p className="text-muted-foreground mt-1">Ejemplos prácticos para las operaciones más comunes.</p>
+            <h3 className="text-lg font-medium">Code Examples</h3>
+            <p className="text-muted-foreground mt-1">Practical examples for the most common operations.</p>
           </div>
 
           <div className="space-y-6">
             <div>
-              <h4 className="font-medium">Solicitar fondos de prueba</h4>
+              <h4 className="font-medium">Request test funds</h4>
               <div className="mt-2">
                 <CopyBlock
                   text={codeExamples.requestFunds}
@@ -147,7 +147,7 @@ console.log(\`Cuenta inteligente creada: \${smartAccount.address}\`);`,
             </div>
 
             <div>
-              <h4 className="font-medium">Enviar una transacción</h4>
+              <h4 className="font-medium">Send a transaction</h4>
               <div className="mt-2">
                 <CopyBlock
                   text={codeExamples.sendTransaction}
@@ -160,7 +160,7 @@ console.log(\`Cuenta inteligente creada: \${smartAccount.address}\`);`,
             </div>
 
             <div>
-              <h4 className="font-medium">Crear una cuenta inteligente</h4>
+              <h4 className="font-medium">Create a smart account</h4>
               <div className="mt-2">
                 <CopyBlock
                   text={codeExamples.smartAccount}
@@ -176,24 +176,24 @@ console.log(\`Cuenta inteligente creada: \${smartAccount.address}\`);`,
 
         <TabsContent value="sdk" className="space-y-6 py-4">
           <div>
-            <h3 className="text-lg font-medium">SDK de Coinbase</h3>
-            <p className="text-muted-foreground mt-1">Información sobre el SDK y sus capacidades.</p>
+            <h3 className="text-lg font-medium">Coinbase SDK</h3>
+            <p className="text-muted-foreground mt-1">Information about the SDK and its capabilities.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 border rounded-lg">
-              <h4 className="font-medium">Características principales</h4>
+              <h4 className="font-medium">Main Features</h4>
               <ul className="mt-2 space-y-1 text-sm">
-                <li>• Creación y gestión de cuentas blockchain</li>
-                <li>• Soporte para múltiples redes (Ethereum, Solana)</li>
-                <li>• Envío y recepción de transacciones</li>
-                <li>• Creación de cuentas inteligentes</li>
-                <li>• Acceso a faucets de prueba</li>
+                <li>• Creation and management of blockchain accounts</li>
+                <li>• Support for multiple networks (Ethereum, Solana)</li>
+                <li>• Sending and receiving transactions</li>
+                <li>• Creation of smart accounts</li>
+                <li>• Access to test faucets</li>
               </ul>
             </div>
 
             <div className="p-4 border rounded-lg">
-              <h4 className="font-medium">Redes soportadas</h4>
+              <h4 className="font-medium">Supported Networks</h4>
               <ul className="mt-2 space-y-1 text-sm">
                 <li>• Ethereum Mainnet</li>
                 <li>• Ethereum Sepolia (Testnet)</li>
@@ -206,74 +206,70 @@ console.log(\`Cuenta inteligente creada: \${smartAccount.address}\`);`,
           </div>
 
           <div className="p-4 border rounded-lg">
-            <h4 className="font-medium">Requisitos</h4>
+            <h4 className="font-medium">Requirements</h4>
             <ul className="mt-2 space-y-1 text-sm">
-              <li>• Node.js v18 o superior</li>
-              <li>• Credenciales de API de Coinbase</li>
-              <li>• Conexión a internet</li>
+              <li>• Node.js v18 or higher</li>
+              <li>• Coinbase API credentials</li>
+              <li>• Internet connection</li>
             </ul>
           </div>
         </TabsContent>
 
         <TabsContent value="widgets" className="space-y-6 py-4">
           <div>
-            <h3 className="text-lg font-medium">Widgets para tu aplicación</h3>
+            <h3 className="text-lg font-medium">Widgets for your application</h3>
             <p className="text-muted-foreground mt-1">
-              Componentes pre-construidos que puedes integrar en tu aplicación.
+              Pre-built components that you can integrate into your application.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-muted p-4">
-                <h4 className="font-medium">Widget de Billetera</h4>
+                <h4 className="font-medium">Wallet Widget</h4>
               </div>
               <div className="p-4">
-                <p className="text-sm text-muted-foreground">
-                  Muestra el balance y permite realizar transacciones básicas.
-                </p>
+                <p className="text-sm text-muted-foreground">Shows the balance and allows basic transactions.</p>
                 <Button className="mt-4 w-full" variant="outline">
-                  Integrar Widget
+                  Integrate Widget
                 </Button>
               </div>
             </div>
 
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-muted p-4">
-                <h4 className="font-medium">Widget de Transacciones</h4>
+                <h4 className="font-medium">Transactions Widget</h4>
               </div>
               <div className="p-4">
-                <p className="text-sm text-muted-foreground">Muestra el historial de transacciones con detalles.</p>
+                <p className="text-sm text-muted-foreground">Shows transaction history with details.</p>
                 <Button className="mt-4 w-full" variant="outline">
-                  Integrar Widget
+                  Integrate Widget
                 </Button>
               </div>
             </div>
 
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-muted p-4">
-                <h4 className="font-medium">Widget de Pago</h4>
+                <h4 className="font-medium">Payment Widget</h4>
               </div>
               <div className="p-4">
                 <p className="text-sm text-muted-foreground">
-                  Permite a los usuarios pagar con criptomonedas en tu aplicación.
+                  Allows users to pay with cryptocurrencies in your application.
                 </p>
                 <Button className="mt-4 w-full" variant="outline">
-                  Integrar Widget
+                  Integrate Widget
                 </Button>
               </div>
             </div>
 
             <div className="border rounded-lg overflow-hidden">
               <div className="bg-muted p-4">
-                <h4 className="font-medium">Widget de Onboarding</h4>
+                <h4 className="font-medium">Onboarding Widget</h4>
               </div>
               <div className="p-4">
-                <p className="text-sm text-muted-foreground">
-                  Guía a los usuarios en la creación de su primera billetera.
-                </p>
+                <p className="text-sm text-muted-foreground">Guides users in creating their first wallet.</p>
                 <Button className="mt-4 w-full" variant="outline">
-                  Integrar Widget
+                  Integrate Widget
                 </Button>
               </div>
             </div>
